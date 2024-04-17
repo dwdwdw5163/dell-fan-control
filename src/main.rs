@@ -52,12 +52,14 @@ fn impi_info() {
         .expect("failed to execute process");
     
     //Read fan speed
+    println!("Fan Speed:");
     std::process::Command::new("ipmitool")
         .args(["sdr", "type", "fan"])
         .status()
         .expect("failed to execute process");
 
     //Read Temp
+    println!("Temperature:");
     std::process::Command::new("ipmitool")
         .args(["sdr", "type", "temp"])
         .status()
