@@ -33,15 +33,31 @@ fn compute_temp() -> f64 {
 
 #[tracing::instrument]
 fn set_pwm(target: u32) {
-    info!("Set PWM to {}", target);
+    let target_hex = format!("{:#04x}", target);
+    info!("Set PWM to {}({})", target, target_hex);
+    // std::process::Command::new("ipmitool")
+    //     .args(["raw", "0x30", "0x30", "0x02", "0xff", &target_hex])
+    //     .spawn()
+    //     .expect("failed to execute process");
+    
 }
 
 #[tracing::instrument]
-fn init() {
+fn impi_info() {
+    info!("Enable Manual Fan Control");
+    //enable manual fan control
+    std::process::Command::new("ipmitool")
+        .args(["raw", "0x30", "0x30", "0x01", "0x00"])
+        .spawn()
+        .expect("failed to execute process");
+    
+    //Read fan speed
     std::process::Command::new("ipmitool")
         .args(["sdr", "type", "fan"])
         .spawn()
         .expect("failed to execute process");
+
+    //Read Temp
     std::process::Command::new("ipmitool")
         .args(["sdr", "type", "temp"])
         .spawn()
@@ -50,7 +66,7 @@ fn init() {
 
 fn main() {
     tracing_subscriber::fmt::init();
-    init();
+    impi_info();
 
     let mut context = Context::default();
 
@@ -61,9 +77,11 @@ fn main() {
         if temp_level > context.current_temp_level {
             context.current_temp_level = temp_level;
             set_pwm((context.current_temp_level - 10).max(0));
+            impi_info();
         } else if temp < (context.current_temp_level as f64 - HYSTERESIS) {
             context.current_temp_level = temp_level;
             set_pwm((context.current_temp_level - 10).max(0));
+            impi_info();
         } else {
         }
     }
