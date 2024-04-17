@@ -37,7 +37,7 @@ fn set_pwm(target: u32) {
     info!("Set PWM to {}({})", target, target_hex);
     // std::process::Command::new("ipmitool")
     //     .args(["raw", "0x30", "0x30", "0x02", "0xff", &target_hex])
-    //     .spawn()
+    //     .status()
     //     .expect("failed to execute process");
     
 }
@@ -48,19 +48,19 @@ fn impi_info() {
     //enable manual fan control
     std::process::Command::new("ipmitool")
         .args(["raw", "0x30", "0x30", "0x01", "0x00"])
-        .spawn()
+        .status()
         .expect("failed to execute process");
     
     //Read fan speed
     std::process::Command::new("ipmitool")
         .args(["sdr", "type", "fan"])
-        .spawn()
+        .status()
         .expect("failed to execute process");
 
     //Read Temp
     std::process::Command::new("ipmitool")
         .args(["sdr", "type", "temp"])
-        .spawn()
+        .status()
         .expect("failed to execute process");
 }
 
